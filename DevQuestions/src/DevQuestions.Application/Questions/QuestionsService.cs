@@ -28,7 +28,7 @@ public class QuestionsService
         // Сохранение сущности в БД
         // Логирование об успешном или неуспешном сохранении 
     }
-
+    /*
     public async Task<IActionResult> Update(
         [FromRoute] Guid questionId,
         [FromBody] UpdateQuestionDto request,
@@ -51,5 +51,5 @@ public class QuestionsService
         AddAnswerDto request,
         CancellationToken cancellationToken)
     {
-    }
+    }*/
 }
