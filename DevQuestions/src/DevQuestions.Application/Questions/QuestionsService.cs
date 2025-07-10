@@ -9,7 +9,7 @@ public class QuestionsService
     {
         
     }
-    
+    /*
     public async Task Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
     {
         // проверка валидности
