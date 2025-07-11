@@ -16,4 +16,8 @@
     <ProjectReference Include="..\DevQuestions.Domain\DevQuestions.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Comments\" />
+  </ItemGroup>
+
 </Project>

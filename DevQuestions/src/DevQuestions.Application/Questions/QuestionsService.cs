@@ -1,34 +1,51 @@
-﻿using DevQuestions.Contracts;
+﻿using DevQuestions.Contracts.Questions;
 using DevQuestions.Domain.Questions;
+using FluentValidation;
+using Microsoft.Extensions.Logging;
 
-namespace DevQuestions.Application;
+namespace DevQuestions.Application.Questions;
 
 public class QuestionsService
 {
-    public QuestionsService()
+    private readonly ILogger<QuestionsService> _logger;
+    private readonly IQuestionsRepository _questionsRepository;
+    private readonly IValidator<CreateQuestionDto> _validator;
+
+    public QuestionsService(
+        IQuestionsRepository questionsRepository,
+        ILogger<QuestionsService> logger,
+        IValidator<CreateQuestionDto> validator)
     {
-        
+        _logger = logger;
+        _validator = validator;
+        _questionsRepository = questionsRepository;
     }
-    /*
+
     public async Task Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
     {
-        // проверка валидности
+        var validationResult = await _validator.ValidateAsync(questionDto, cancellationToken);
+        if (validationResult.IsValid == false)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+        
+        
 
-        // создание сущности Question
         var questionId = Guid.NewGuid();
 
         var question = new Question(
-            Id = questionId,
-            Title = questionDto.Title,
-            Text = questionDto.Text,
-            UserId = questionDto.UserId,
-            screenshotId = null,
-            Tags = questionDto.TagIds);
+            questionId,
+            questionDto.Title,
+            questionDto.Text,
+            questionDto.UserId,
+            null,
+            questionDto.TagIds);
 
-        // Сохранение сущности в БД
-        // Логирование об успешном или неуспешном сохранении 
+        await _questionsRepository.AddAsync(question, cancellationToken);
+
+        _logger.LogInformation("Question created with id {questionId}", questionId);
     }
-    /*
+
     public async Task<IActionResult> Update(
         [FromRoute] Guid questionId,
         [FromBody] UpdateQuestionDto request,
@@ -51,5 +68,5 @@ public class QuestionsService
         AddAnswerDto request,
         CancellationToken cancellationToken)
     {
-    }*/
+    }
 }

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using DevQuestions.Contracts;
+﻿using DevQuestions.Contracts.Questions;
+using Microsoft.AspNetCore.Mvc;
 
-namespace DevQuestions.Presenters
+namespace DevQuestions.Presenters.Questions
 {
     [ApiController]
     [Route("[controller]")]
