@@ -11,4 +11,6 @@ public interface IQuestionsRepository
     Task<Guid> DeleteAsync(Guid questionId, CancellationToken cancellationToken);
 
     Task<Guid> GetByIdAsync(Guid questionId, CancellationToken cancellationToken);
+
+    Task<int> GetUnresolvedUserQuestionsAsync(Guid userId, CancellationToken cancellationToken);
 }
