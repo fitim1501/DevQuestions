@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevQuestions.Contracts", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevQuestions.Application", "src\DevQuestions.Application\DevQuestions.Application.csproj", "{75300C15-549D-48AF-A3A0-637CE09222AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevQuestions.Infrastructure.Postgres", "src\DevQuestions.Infrastructure.Postgres\DevQuestions.Infrastructure.Postgres.csproj", "{35D024FE-B727-4006-9F41-4CD18FBEB226}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{75300C15-549D-48AF-A3A0-637CE09222AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75300C15-549D-48AF-A3A0-637CE09222AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75300C15-549D-48AF-A3A0-637CE09222AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35D024FE-B727-4006-9F41-4CD18FBEB226}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35D024FE-B727-4006-9F41-4CD18FBEB226}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35D024FE-B727-4006-9F41-4CD18FBEB226}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35D024FE-B727-4006-9F41-4CD18FBEB226}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{CE9CC78D-7126-41CA-B43D-73AE552B359E} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{8BEB9879-0704-460D-9F6E-A6242BF5F2E3} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 		{75300C15-549D-48AF-A3A0-637CE09222AC} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
+		{35D024FE-B727-4006-9F41-4CD18FBEB226} = {36D591C7-65C7-A0D1-1CBC-10CDE441BDC8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4173EABF-85C1-436E-86A1-AA26E1FCA2B8}
