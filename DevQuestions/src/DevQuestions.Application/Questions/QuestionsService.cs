@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DevQuestions.Application.Questions;
 
-public class QuestionsService : IQuestionsService
+public class QuestionsService : IQuestionService
 {
     private readonly ILogger<QuestionsService> _logger;
     private readonly IQuestionsRepository _questionsRepository;
@@ -21,7 +21,7 @@ public class QuestionsService : IQuestionsService
         _questionsRepository = questionsRepository;
     }
 
-    public async Task<Guid> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
+    public async Task Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
     {
         var validationResult = await _validator.ValidateAsync(questionDto, cancellationToken);
         if (validationResult.IsValid == false)
@@ -29,11 +29,12 @@ public class QuestionsService : IQuestionsService
             throw new ValidationException(validationResult.Errors);
         }
 
-        int getOpenUserQuestionsCount = await _questionsRepository.GetOpenUserQuestionsAsync(questionDto.UserId, cancellationToken);
+        int openUserQuestionCount = await _questionsRepository
+            .GetOpenUserQuestionsAsync(questionDto.UserId, cancellationToken);
 
-        if (getOpenUserQuestionsCount > 3)
+        if (openUserQuestionCount > 3)
         {
-            throw new Exception("Пользователь не может больше 3 вопросов.");
+            throw new Exception("Пользователь не может открыть больше 3 вопросов.");
         }
 
         var questionId = Guid.NewGuid();
@@ -49,8 +50,6 @@ public class QuestionsService : IQuestionsService
         await _questionsRepository.AddAsync(question, cancellationToken);
 
         _logger.LogInformation("Question created with id {questionId}", questionId);
-
-        return questionId;
     }
 
     // public async Task<IActionResult> Update(
@@ -61,6 +60,8 @@ public class QuestionsService : IQuestionsService
     // } 
     // public async Task<IActionResult> Delete(Guid questionId, CancellationToken cancellationToken)
     // {
+    //     var question = await _questionsRepository.GetByIdAsync(questionId, cancellationToken);
+    //     
     // }
     //
     // public async Task<IActionResult> SelectSolution(
