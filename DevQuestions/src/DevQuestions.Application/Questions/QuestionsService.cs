@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DevQuestions.Application.Questions;
 
-public class QuestionsService
+public class QuestionsService : IQuestionService
 {
     private readonly ILogger<QuestionsService> _logger;
     private readonly IQuestionsRepository _questionsRepository;
@@ -28,8 +28,14 @@ public class QuestionsService
         {
             throw new ValidationException(validationResult.Errors);
         }
-        
-        
+
+        int openUserQuestionCount = await _questionsRepository
+            .GetOpenUserQuestionsAsync(questionDto.UserId, cancellationToken);
+
+        if (openUserQuestionCount > 3)
+        {
+            throw new Exception("Пользователь не может открыть больше 3 вопросов.");
+        }
 
         var questionId = Guid.NewGuid();
 
@@ -46,27 +52,29 @@ public class QuestionsService
         _logger.LogInformation("Question created with id {questionId}", questionId);
     }
 
-    public async Task<IActionResult> Update(
-        [FromRoute] Guid questionId,
-        [FromBody] UpdateQuestionDto request,
-        CancellationToken cancellationToken)
-    { 
-    } 
-    public async Task<IActionResult> Delete(Guid questionId, CancellationToken cancellationToken)
-    {
-    }
-
-    public async Task<IActionResult> SelectSolution(
-        Guid questionId,
-        Guid answerId,
-        CancellationToken cancellationToken)
-    {
-    }
-
-    public async Task<IActionResult> AddAnswer(
-        Guid questionId,
-        AddAnswerDto request,
-        CancellationToken cancellationToken)
-    {
-    }
+    // public async Task<IActionResult> Update(
+    //     [FromRoute] Guid questionId,
+    //     [FromBody] UpdateQuestionDto request,
+    //     CancellationToken cancellationToken)
+    // { 
+    // } 
+    // public async Task<IActionResult> Delete(Guid questionId, CancellationToken cancellationToken)
+    // {
+    //     var question = await _questionsRepository.GetByIdAsync(questionId, cancellationToken);
+    //     
+    // }
+    //
+    // public async Task<IActionResult> SelectSolution(
+    //     Guid questionId,
+    //     Guid answerId,
+    //     CancellationToken cancellationToken)
+    // {
+    // }
+    //
+    // public async Task<IActionResult> AddAnswer(
+    //     Guid questionId,
+    //     AddAnswerDto request,
+    //     CancellationToken cancellationToken)
+    // {
+    // }
 }
