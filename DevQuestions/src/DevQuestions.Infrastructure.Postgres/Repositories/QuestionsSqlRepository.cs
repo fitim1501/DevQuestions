@@ -1,32 +1,46 @@
-﻿using DevQuestions.Application.Questions;
+﻿using Dapper;
+using DevQuestions.Application.DataBase;
+using DevQuestions.Application.Questions;
 using DevQuestions.Domain.Questions;
 
-namespace DevQuestion.Infrastructure.Postgres.Repositories;
+namespace DevQuestions.Infrastructure.Postgres.Repositories;
 
 public class QuestionsSqlRepository : IQuestionsRepository
 {
+    private readonly ISqlConnectionFactory sqlConnectionFactory;
+
+    public QuestionsSqlRepository(ISqlConnectionFactory sqlConnectionFactory)
+    {
+        this.sqlConnectionFactory = sqlConnectionFactory;
+    }
     public async Task<Guid> AddAsync(Question question, CancellationToken cancellationToken)
     {
-        
+        const string sql = """
+                            insert into questions (id, title, text, user_id, screenshot_id, tags, status)
+                            values (@Id, @Title, @Text, @UserId, @ScreenshotId, @Tags, @Status)
+                           """;
+
+        using var connect = sqlConnectionFactory.Creat();
+
+        await connect.ExecuteAsync(sql, new
+        {
+            Id = question.Id,
+            Title = question.Title,
+            Text = question.Text,
+            UserId = question.UserId,
+            ScreenshotId = question.ScreenshotId,
+            Tags = question.Tags.ToArray(),
+            Status = question.Status,
+        });
+
+        return question.Id;
     }
 
-    public async Task<Guid> SaveAsync(Question question, CancellationToken cancellationToken)
-    {
-        
-    }
+    public Task<Guid> SaveAsync(Question question, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-    public Task<Guid> DeleteAsync(Guid questionId, CancellationToken cancellationToken)
-    {
-        
-    }
+    public Task<Guid> DeleteAsync(Guid questionId, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-    public Task<Guid> GetByIdAsync(Guid questionId, CancellationToken cancellationToken)
-    {
-        
-    }
+    public Task<Question?> GetByIdAsync(Guid questionId, CancellationToken cancellationToken) => throw new NotImplementedException();
 
-    public Task<int> GetUnresolvedUserQuestionsAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        
-    }
+    public Task<int> GetOpenUserQuestionsAsync(Guid userId, CancellationToken cancellationToken) => throw new NotImplementedException();
 }

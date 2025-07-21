@@ -1,13 +1,19 @@
-﻿using DevQuestions.Contracts.Questions;
+﻿using DevQuestions.Application.FulltextSearch;
+using DevQuestions.Application.Questions.Exceptions;
+using DevQuestions.Application.Questions.Fails;
+using DevQuestions.Application.Questions.Fails.Exceptions;
+using DevQuestions.Contracts.Questions;
 using DevQuestions.Domain.Questions;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
+using Shared;
 
 namespace DevQuestions.Application.Questions;
 
-public class QuestionsService : IQuestionService
+public class QuestionsService : IQuestionsService
 {
     private readonly ILogger<QuestionsService> _logger;
+    private readonly ISearchProvider _searchProvider;
     private readonly IQuestionsRepository _questionsRepository;
     private readonly IValidator<CreateQuestionDto> _validator;
 
@@ -21,20 +27,28 @@ public class QuestionsService : IQuestionService
         _questionsRepository = questionsRepository;
     }
 
-    public async Task Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
+    public async Task<Guid> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
     {
         var validationResult = await _validator.ValidateAsync(questionDto, cancellationToken);
         if (validationResult.IsValid == false)
         {
-            throw new ValidationException(validationResult.Errors);
+            var errors = validationResult.Errors.Select(e => Error.Validation(
+                e.ErrorCode,
+                e.ErrorMessage,
+                e.PropertyName
+            )).ToArray();
+
+            throw new QuestionValidationException(errors);
         }
 
         int openUserQuestionCount = await _questionsRepository
             .GetOpenUserQuestionsAsync(questionDto.UserId, cancellationToken);
 
+        var existedQuestion = await _questionsRepository.GetByIdAsync(Guid.Empty, cancellationToken);
+
         if (openUserQuestionCount > 3)
         {
-            throw new Exception("Пользователь не может открыть больше 3 вопросов.");
+            throw new ToManyQuestionsException();
         }
 
         var questionId = Guid.NewGuid();
@@ -50,6 +64,8 @@ public class QuestionsService : IQuestionService
         await _questionsRepository.AddAsync(question, cancellationToken);
 
         _logger.LogInformation("Question created with id {questionId}", questionId);
+
+        return questionId;
     }
 
     // public async Task<IActionResult> Update(

@@ -2,7 +2,7 @@
 using DevQuestions.Domain.Questions;
 using Microsoft.EntityFrameworkCore;
 
-namespace DevQuestion.Infrastructure.Postgres.Repositories;
+namespace DevQuestions.Infrastructure.Postgres.Repositories;
 
 public class QuestionsEfCoreRepository : IQuestionsRepository
 {
@@ -22,9 +22,15 @@ public class QuestionsEfCoreRepository : IQuestionsRepository
         return question.Id;
     }
 
-    public Task<Guid> SaveAsync(Question question, CancellationToken cancellationToken) => throw new NotImplementedException();
+    public Task<Guid> SaveAsync(Question question, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 
-    public Task<Guid> DeleteAsync(Guid questionId, CancellationToken cancellationToken) => throw new NotImplementedException();
+    public Task<Guid> DeleteAsync(Guid questionId, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 
     public async Task<Question?> GetByIdAsync(Guid questionId, CancellationToken cancellationToken)
     {
@@ -36,8 +42,10 @@ public class QuestionsEfCoreRepository : IQuestionsRepository
         return question;
     }
 
+    public Task<int> GetOpenUserQuestionsAsync(Guid userId, CancellationToken cancellationToken) => throw new NotImplementedException();
+
     public Task<int> GetUnresolvedUserQuestionsAsync(Guid userId, CancellationToken cancellationToken)
     {
-        
+        throw new NotImplementedException();
     }
 }
