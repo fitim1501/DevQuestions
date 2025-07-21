@@ -1,4 +1,5 @@
-﻿using DevQuestions.Application.FulltextSearch;
+﻿using DevQuestions.Application.Extensions;
+using DevQuestions.Application.FulltextSearch;
 using DevQuestions.Application.Questions.Exceptions;
 using DevQuestions.Application.Questions.Fails;
 using DevQuestions.Application.Questions.Fails.Exceptions;
@@ -32,13 +33,7 @@ public class QuestionsService : IQuestionsService
         var validationResult = await _validator.ValidateAsync(questionDto, cancellationToken);
         if (validationResult.IsValid == false)
         {
-            var errors = validationResult.Errors.Select(e => Error.Validation(
-                e.ErrorCode,
-                e.ErrorMessage,
-                e.PropertyName
-            )).ToArray();
-
-            throw new QuestionValidationException(errors);
+            throw new QuestionValidationException(validationResult.ToErrors());
         }
 
         int openUserQuestionCount = await _questionsRepository
