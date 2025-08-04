@@ -99,10 +99,10 @@ public class QuestionsService : IQuestionsService
 
 public class QuestionCalculate()
 {
-    public Result Calculate()
+    public Result<int> Calculate()
     {
         // операция
-        return Result.Success();
+        return 10;
     }
 }
 
@@ -127,6 +127,8 @@ public class Result
     public static Result Failure(Error error) => new (error);
 
     public static Result Success() => new();
+    
+    public static implicit operator Result(Error error) => Failure(error);
 }
 
 public sealed class Result<TValue> : Result
@@ -144,11 +146,11 @@ public sealed class Result<TValue> : Result
 
     public static Result<TValue> Success(TValue value) => new (value);
 
-    // public static implicit operator Result<TValue>(Error error) => Failure(error);
-    //
-    // public static implicit operator Result<TValue>(TValue value) => Success(value);
-    //
-    // public static implicit operator TValue(Result<TValue> value) => value._value;
+    public static implicit operator Result<TValue>(Error error) => Failure(error);
+
+    public static implicit operator Result<TValue>(TValue value) => Success(value);
+
+    public static implicit operator TValue(Result<TValue> value) => value._value;
     
-    public TValue Value => IsSuccess ? _value : throw new ResultException();
+    public TValue Value => IsSuccess ? _value : throw new ApplicationException("Result is not success");
 }
