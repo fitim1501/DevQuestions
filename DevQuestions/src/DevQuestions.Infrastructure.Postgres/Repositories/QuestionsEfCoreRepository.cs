@@ -2,7 +2,7 @@
 using DevQuestions.Domain.Questions;
 using Microsoft.EntityFrameworkCore;
 
-namespace DevQuestions.Infrastructure.Postgres.Repositories;
+namespace DevQuestion.Infrastructure.Postgres.Repositories;
 
 public class QuestionsEfCoreRepository : IQuestionsRepository
 {

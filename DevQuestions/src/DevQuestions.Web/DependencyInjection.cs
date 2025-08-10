@@ -1,5 +1,5 @@
-﻿using DevQuestions.Application;
-using DevQuestions.Infrastructure.Postgres;
+﻿using DevQuestion.Infrastructure.Postgres;
+using DevQuestions.Application;
 
 namespace DevQuestions.Web;
 

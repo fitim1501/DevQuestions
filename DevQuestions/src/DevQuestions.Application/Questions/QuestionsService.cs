@@ -1,6 +1,6 @@
-﻿using DevQuestions.Application.Extensions;
+﻿using CSharpFunctionalExtensions;
+using DevQuestions.Application.Extensions;
 using DevQuestions.Application.FulltextSearch;
-using DevQuestions.Application.Questions.Exceptions;
 using DevQuestions.Application.Questions.Fails;
 using DevQuestions.Application.Questions.Fails.Exceptions;
 using DevQuestions.Contracts.Questions;
@@ -14,7 +14,6 @@ namespace DevQuestions.Application.Questions;
 public class QuestionsService : IQuestionsService
 {
     private readonly ILogger<QuestionsService> _logger;
-    private readonly ISearchProvider _searchProvider;
     private readonly IQuestionsRepository _questionsRepository;
     private readonly IValidator<CreateQuestionDto> _validator;
 
@@ -28,20 +27,23 @@ public class QuestionsService : IQuestionsService
         _questionsRepository = questionsRepository;
     }
 
-    public async Task<Guid> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Failure>> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
     {
         var validationResult = await _validator.ValidateAsync(questionDto, cancellationToken);
         if (validationResult.IsValid == false)
         {
-            throw new QuestionValidationException(validationResult.ToErrors());
+            return validationResult.ToErrors();
         }
 
         var calculator = new QuestionCalculate();
 
-        Result calculateResult = calculator.Calculate();
+        var calculateResult = calculator.Calculate();
         if (calculateResult.IsFailure)
         {
+            return calculateResult.Error;
         }
+
+        int value = calculateResult.Value;
 
         int openUserQuestionCount = await _questionsRepository
             .GetOpenUserQuestionsAsync(questionDto.UserId, cancellationToken);
@@ -50,7 +52,7 @@ public class QuestionsService : IQuestionsService
 
         if (openUserQuestionCount > 3)
         {
-            throw new ToManyQuestionsException();
+            return Errors.Questions.ToManyQuestions().ToFailure();
         }
 
         var questionId = Guid.NewGuid();
@@ -99,58 +101,9 @@ public class QuestionsService : IQuestionsService
 
 public class QuestionCalculate()
 {
-    public Result<int> Calculate()
+    public Result<int, Failure> Calculate()
     {
         // операция
-        return 10;
+        return Error.Failure("", "").ToFailure();
     }
-}
-
-public class Result
-{
-    public bool IsSuccess { get; }
-    public bool IsFailure => !IsSuccess;
-    public Error Error { get; }
-
-    protected Result()
-    {
-        IsSuccess = true;
-        Error = Error.None;
-    }
-
-    protected Result(Error error)
-    {
-        IsSuccess = false;
-        Error = error;
-    }
-
-    public static Result Failure(Error error) => new (error);
-
-    public static Result Success() => new();
-    
-    public static implicit operator Result(Error error) => Failure(error);
-}
-
-public sealed class Result<TValue> : Result
-{
-    private readonly TValue _value = default!;
-
-    private Result(TValue value) => _value = value;
-
-    private Result(Error error)
-        : base(error)
-    {
-    }
-
-    public new static Result<TValue> Failure(Error error) => new(error);
-
-    public static Result<TValue> Success(TValue value) => new (value);
-
-    public static implicit operator Result<TValue>(Error error) => Failure(error);
-
-    public static implicit operator Result<TValue>(TValue value) => Success(value);
-
-    public static implicit operator TValue(Result<TValue> value) => value._value;
-    
-    public TValue Value => IsSuccess ? _value : throw new ApplicationException("Result is not success");
 }

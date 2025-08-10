@@ -30,6 +30,8 @@ public record Error
 
     public static Error Failure(string? code, string message)
         => new(code ?? "failure", message, ErrorType.FAILURE);
+
+    public Failure ToFailure() => this;
 }
 
 public enum ErrorType

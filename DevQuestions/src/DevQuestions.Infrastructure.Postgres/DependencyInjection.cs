@@ -1,9 +1,8 @@
-﻿using DevQuestions.Application.DataBase;
-using DevQuestions.Infrastructure.Postgres.Repositories;
+﻿using DevQuestion.Infrastructure.Postgres.Repositories;
 using DevQuestions.Application.Questions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DevQuestions.Infrastructure.Postgres;
+namespace DevQuestion.Infrastructure.Postgres;
 
 public static class DependencyInjection
 {

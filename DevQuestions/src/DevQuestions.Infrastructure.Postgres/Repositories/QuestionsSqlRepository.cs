@@ -3,7 +3,7 @@ using DevQuestions.Application.DataBase;
 using DevQuestions.Application.Questions;
 using DevQuestions.Domain.Questions;
 
-namespace DevQuestions.Infrastructure.Postgres.Repositories;
+namespace DevQuestion.Infrastructure.Postgres.Repositories;
 
 public class QuestionsSqlRepository : IQuestionsRepository
 {

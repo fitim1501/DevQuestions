@@ -1,8 +1,7 @@
-﻿using System.Text.Json;
-using DevQuestions.Application.Exceptions;
+﻿using DevQuestions.Application.Exceptions;
 using Shared;
 
-namespace DevQuestions.Application.Questions.Exceptions;
+namespace DevQuestions.Application.Questions.Fails.Exceptions;
 
 public class QuestionNotFoundException : NotFoundException
 {
