@@ -15,21 +15,24 @@ public class QuestionsService : IQuestionsService
 {
     private readonly ILogger<QuestionsService> _logger;
     private readonly IQuestionsRepository _questionsRepository;
-    private readonly IValidator<CreateQuestionDto> _validator;
+    private readonly IValidator<CreateQuestionDto> _createQuestionDtoValidator;
+    private readonly IValidator<AddAnswerDto> _addAnswerDtoValidator;
 
     public QuestionsService(
         IQuestionsRepository questionsRepository,
         ILogger<QuestionsService> logger,
-        IValidator<CreateQuestionDto> validator)
+        IValidator<CreateQuestionDto> createQuestionDtoValidator,
+        IValidator<AddAnswerDto> addAnswerDtoValidator)
     {
         _logger = logger;
-        _validator = validator;
+        _createQuestionDtoValidator = createQuestionDtoValidator;
+        _addAnswerDtoValidator = addAnswerDtoValidator;
         _questionsRepository = questionsRepository;
     }
 
     public async Task<Result<Guid, Failure>> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(questionDto, cancellationToken);
+        var validationResult = await _createQuestionDtoValidator.ValidateAsync(questionDto, cancellationToken);
         if (validationResult.IsValid == false)
         {
             return validationResult.ToErrors();
@@ -91,12 +94,31 @@ public class QuestionsService : IQuestionsService
     // {
     // }
     //
-    // public async Task<IActionResult> AddAnswer(
-    //     Guid questionId,
-    //     AddAnswerDto request,
-    //     CancellationToken cancellationToken)
-    // {
-    // }
+    public async Task<Result<Guid, Failure>> AddAnswer(
+        Guid questionId,
+        AddAnswerDto addAnswerDto,
+        CancellationToken cancellationToken)
+    {
+        var validationResult = await _addAnswerDtoValidator.ValidateAsync(addAnswerDto, cancellationToken);
+        if (validationResult.IsValid == false)
+        {
+            return validationResult.ToErrors();
+        }
+
+        var questionResult = await _questionsRepository.GetByIdAsync(questionId, cancellationToken);
+        if (questionResult.IsFailure)
+        {
+            return questionResult.Error;
+        }
+
+        var answer = new Answer(Guid.NewGuid(), addAnswerDto.UserId, addAnswerDto.Text, questionId);
+
+        var answerId = await _questionsRepository.AddAnswerAsync(answer, cancellationToken);
+
+        _logger.LogInformation("Answer added with id {anserId} to question {questionId}", answerId, questionId);
+
+        return answerId;
+    }
 }
 
 public class QuestionCalculate()
