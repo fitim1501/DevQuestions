@@ -15,5 +15,4 @@ public interface IQuestionsRepository
     Task<Result<Question, Failure>> GetByIdAsync(Guid questionId, CancellationToken cancellationToken);
 
     Task<int> GetOpenUserQuestionsAsync(Guid userId, CancellationToken cancellationToken);
-    Task<Guid> AddAnswerAsync(Answer answer, CancellationToken cancellationToken);
 }

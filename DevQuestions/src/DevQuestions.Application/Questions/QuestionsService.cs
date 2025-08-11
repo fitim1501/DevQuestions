@@ -1,4 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
+using DevQuestions.Application.Communication;
+using DevQuestions.Application.DataBase;
 using DevQuestions.Application.Extensions;
 using DevQuestions.Application.FulltextSearch;
 using DevQuestions.Application.Questions.Fails;
@@ -17,62 +19,23 @@ public class QuestionsService : IQuestionsService
     private readonly IQuestionsRepository _questionsRepository;
     private readonly IValidator<CreateQuestionDto> _createQuestionDtoValidator;
     private readonly IValidator<AddAnswerDto> _addAnswerDtoValidator;
+    private readonly ITransactionManager _transactionManager;
+    private readonly IUsersCommunicationService _usersCommunicationService;
 
     public QuestionsService(
         IQuestionsRepository questionsRepository,
         ILogger<QuestionsService> logger,
         IValidator<CreateQuestionDto> createQuestionDtoValidator,
-        IValidator<AddAnswerDto> addAnswerDtoValidator)
+        IValidator<AddAnswerDto> addAnswerDtoValidator,
+        ITransactionManager transactionManager,
+        IUsersCommunicationService usersCommunicationService)
     {
         _logger = logger;
         _createQuestionDtoValidator = createQuestionDtoValidator;
         _addAnswerDtoValidator = addAnswerDtoValidator;
+        _transactionManager = transactionManager;
+        _usersCommunicationService = usersCommunicationService;
         _questionsRepository = questionsRepository;
-    }
-
-    public async Task<Result<Guid, Failure>> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
-    {
-        var validationResult = await _createQuestionDtoValidator.ValidateAsync(questionDto, cancellationToken);
-        if (validationResult.IsValid == false)
-        {
-            return validationResult.ToErrors();
-        }
-
-        var calculator = new QuestionCalculate();
-
-        var calculateResult = calculator.Calculate();
-        if (calculateResult.IsFailure)
-        {
-            return calculateResult.Error;
-        }
-
-        int value = calculateResult.Value;
-
-        int openUserQuestionCount = await _questionsRepository
-            .GetOpenUserQuestionsAsync(questionDto.UserId, cancellationToken);
-
-        var existedQuestion = await _questionsRepository.GetByIdAsync(Guid.Empty, cancellationToken);
-
-        if (openUserQuestionCount > 3)
-        {
-            return Errors.Questions.ToManyQuestions().ToFailure();
-        }
-
-        var questionId = Guid.NewGuid();
-
-        var question = new Question(
-            questionId,
-            questionDto.Title,
-            questionDto.Text,
-            questionDto.UserId,
-            null,
-            questionDto.TagIds);
-
-        await _questionsRepository.AddAsync(question, cancellationToken);
-
-        _logger.LogInformation("Question created with id {questionId}", questionId);
-
-        return questionId;
     }
 
     // public async Task<IActionResult> Update(
@@ -94,6 +57,8 @@ public class QuestionsService : IQuestionsService
     // {
     // }
     //
+    public Task<Result<Guid, Failure>> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken) => throw new NotImplementedException();
+
     public async Task<Result<Guid, Failure>> AddAnswer(
         Guid questionId,
         AddAnswerDto addAnswerDto,
@@ -105,19 +70,37 @@ public class QuestionsService : IQuestionsService
             return validationResult.ToErrors();
         }
 
-        var questionResult = await _questionsRepository.GetByIdAsync(questionId, cancellationToken);
-        if (questionResult.IsFailure)
+        var usersRatingResult = await _usersCommunicationService.GetUserRating(addAnswerDto.UserId, cancellationToken);
+        if (usersRatingResult.IsFailure)
         {
-            return questionResult.Error;
+            return usersRatingResult.Error;
+        }
+
+        if (usersRatingResult.Value <= 0)
+        {
+            _logger.LogError("User with id {userId} has no rating", addAnswerDto.UserId);
+            return Errors.Questions.NotEnoughRating();
+        }
+
+        var transaction = await _transactionManager.BeginTransactionAsync(cancellationToken);
+
+        (_, bool isFailure, Question? question, Failure? error) = await _questionsRepository.GetByIdAsync(questionId, cancellationToken);
+        if (isFailure)
+        {
+            return error;
         }
 
         var answer = new Answer(Guid.NewGuid(), addAnswerDto.UserId, addAnswerDto.Text, questionId);
 
-        var answerId = await _questionsRepository.AddAnswerAsync(answer, cancellationToken);
+        question.Answers.Add(answer);
 
-        _logger.LogInformation("Answer added with id {anserId} to question {questionId}", answerId, questionId);
+        await _questionsRepository.SaveAsync(question, cancellationToken);
 
-        return answerId;
+        transaction.Commit();
+
+        _logger.LogInformation("Answer added with id {anserId} to question {questionId}", answer.Id, questionId);
+
+        return answer.Id;
     }
 }
 

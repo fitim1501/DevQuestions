@@ -25,9 +25,12 @@ public class QuestionsEfCoreRepository : IQuestionsRepository
         return question.Id;
     }
 
-    public Task<Guid> SaveAsync(Question question, CancellationToken cancellationToken)
+    public async Task<Guid> SaveAsync(Question question, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        _dbContext.Questions.Attach(question);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return question.Id;
     }
 
     public Task<Guid> DeleteAsync(Guid questionId, CancellationToken cancellationToken)
@@ -51,10 +54,4 @@ public class QuestionsEfCoreRepository : IQuestionsRepository
     }
 
     public Task<int> GetOpenUserQuestionsAsync(Guid userId, CancellationToken cancellationToken) => throw new NotImplementedException();
-    public Task<Guid> AddAnswerAsync(Answer answer, CancellationToken cancellationToken) => throw new NotImplementedException();
-
-    public Task<int> GetUnresolvedUserQuestionsAsync(Guid userId, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
 }
