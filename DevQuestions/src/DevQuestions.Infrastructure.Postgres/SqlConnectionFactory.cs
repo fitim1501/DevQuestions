@@ -3,7 +3,7 @@ using DevQuestions.Application.DataBase;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
-namespace DevQuestions.Infrastructure.Postgres;
+namespace DevQuestion.Infrastructure.Postgres;
 
 public class SqlConnectionFactory : ISqlConnectionFactory
 {

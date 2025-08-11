@@ -1,7 +1,7 @@
 ﻿using DevQuestions.Domain.Questions;
 using Microsoft.EntityFrameworkCore;
 
-namespace DevQuestions.Infrastructure.Postgres;
+namespace DevQuestion.Infrastructure.Postgres;
 
 public class QuestionsDbContext : DbContext
 {

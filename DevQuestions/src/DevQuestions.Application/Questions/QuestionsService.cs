@@ -1,6 +1,6 @@
-﻿using DevQuestions.Application.Extensions;
+﻿using CSharpFunctionalExtensions;
+using DevQuestions.Application.Extensions;
 using DevQuestions.Application.FulltextSearch;
-using DevQuestions.Application.Questions.Exceptions;
 using DevQuestions.Application.Questions.Fails;
 using DevQuestions.Application.Questions.Fails.Exceptions;
 using DevQuestions.Contracts.Questions;
@@ -14,27 +14,39 @@ namespace DevQuestions.Application.Questions;
 public class QuestionsService : IQuestionsService
 {
     private readonly ILogger<QuestionsService> _logger;
-    private readonly ISearchProvider _searchProvider;
     private readonly IQuestionsRepository _questionsRepository;
-    private readonly IValidator<CreateQuestionDto> _validator;
+    private readonly IValidator<CreateQuestionDto> _createQuestionDtoValidator;
+    private readonly IValidator<AddAnswerDto> _addAnswerDtoValidator;
 
     public QuestionsService(
         IQuestionsRepository questionsRepository,
         ILogger<QuestionsService> logger,
-        IValidator<CreateQuestionDto> validator)
+        IValidator<CreateQuestionDto> createQuestionDtoValidator,
+        IValidator<AddAnswerDto> addAnswerDtoValidator)
     {
         _logger = logger;
-        _validator = validator;
+        _createQuestionDtoValidator = createQuestionDtoValidator;
+        _addAnswerDtoValidator = addAnswerDtoValidator;
         _questionsRepository = questionsRepository;
     }
 
-    public async Task<Guid> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
+    public async Task<Result<Guid, Failure>> Create(CreateQuestionDto questionDto, CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(questionDto, cancellationToken);
+        var validationResult = await _createQuestionDtoValidator.ValidateAsync(questionDto, cancellationToken);
         if (validationResult.IsValid == false)
         {
-            throw new QuestionValidationException(validationResult.ToErrors());
+            return validationResult.ToErrors();
         }
+
+        var calculator = new QuestionCalculate();
+
+        var calculateResult = calculator.Calculate();
+        if (calculateResult.IsFailure)
+        {
+            return calculateResult.Error;
+        }
+
+        int value = calculateResult.Value;
 
         int openUserQuestionCount = await _questionsRepository
             .GetOpenUserQuestionsAsync(questionDto.UserId, cancellationToken);
@@ -43,7 +55,7 @@ public class QuestionsService : IQuestionsService
 
         if (openUserQuestionCount > 3)
         {
-            throw new ToManyQuestionsException();
+            return Errors.Questions.ToManyQuestions().ToFailure();
         }
 
         var questionId = Guid.NewGuid();
@@ -82,10 +94,38 @@ public class QuestionsService : IQuestionsService
     // {
     // }
     //
-    // public async Task<IActionResult> AddAnswer(
-    //     Guid questionId,
-    //     AddAnswerDto request,
-    //     CancellationToken cancellationToken)
-    // {
-    // }
+    public async Task<Result<Guid, Failure>> AddAnswer(
+        Guid questionId,
+        AddAnswerDto addAnswerDto,
+        CancellationToken cancellationToken)
+    {
+        var validationResult = await _addAnswerDtoValidator.ValidateAsync(addAnswerDto, cancellationToken);
+        if (validationResult.IsValid == false)
+        {
+            return validationResult.ToErrors();
+        }
+
+        var questionResult = await _questionsRepository.GetByIdAsync(questionId, cancellationToken);
+        if (questionResult.IsFailure)
+        {
+            return questionResult.Error;
+        }
+
+        var answer = new Answer(Guid.NewGuid(), addAnswerDto.UserId, addAnswerDto.Text, questionId);
+
+        var answerId = await _questionsRepository.AddAnswerAsync(answer, cancellationToken);
+
+        _logger.LogInformation("Answer added with id {anserId} to question {questionId}", answerId, questionId);
+
+        return answerId;
+    }
+}
+
+public class QuestionCalculate()
+{
+    public Result<int, Failure> Calculate()
+    {
+        // операция
+        return Error.Failure("", "").ToFailure();
+    }
 }
