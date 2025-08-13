@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DevQuestions.Application.Abstractions;
 using DevQuestions.Application.Extensions;
 using DevQuestions.Application.Questions.Fails;
 using DevQuestions.Contracts.Questions;
@@ -7,9 +8,9 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Shared;
 
-namespace DevQuestions.Application.Questions.CreateQuestion;
+namespace DevQuestions.Application.Questions.Features.CreateQuestion;
 
-public class CreateQuestionHandler
+public class CreateQuestionHandler : IHandler<Guid,  CreateQuestionCommand>
 {
     private readonly ILogger<CreateQuestionHandler> _logger;
     private readonly IQuestionsRepository _questionsRepository;

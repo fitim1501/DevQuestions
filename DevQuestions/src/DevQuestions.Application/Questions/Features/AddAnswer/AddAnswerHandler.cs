@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DevQuestions.Application.Abstractions;
 using DevQuestions.Application.Communication;
 using DevQuestions.Application.DataBase;
 using DevQuestions.Application.Extensions;
@@ -9,8 +10,8 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using Shared;
 
-namespace DevQuestions.Application.Questions.AddAnswer;
-public class AddAnswerHandler
+namespace DevQuestions.Application.Questions.Features.AddAnswer;
+public class AddAnswerHandler : IHandler<Guid, AddAnswerCommand>
 {
     private readonly ILogger<AddAnswerHandler> _logger;
     private readonly IValidator<AddAnswerDto> _addAnswerDtoValidator;

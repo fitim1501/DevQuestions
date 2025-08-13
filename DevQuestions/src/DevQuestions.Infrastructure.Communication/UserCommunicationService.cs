@@ -6,6 +6,6 @@ namespace DevQuestions.Infrastructure.Communication;
 
 public class UsersCommunicationService: IUsersCommunicationService
 {
-    public Task<Result<long, Failure>> GetUserRating(Guid userId, CancellationToken cancellationToken = default) 
+    public Task<Result<long, Failure>> GetUserRating(Guid userId, CancellationToken cancellationToken = default)
         => throw new NotImplementedException();
 }

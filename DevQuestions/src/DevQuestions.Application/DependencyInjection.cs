@@ -1,6 +1,9 @@
-﻿using DevQuestions.Application.Questions;
+﻿using DevQuestions.Application.Abstractions;
+using DevQuestions.Application.Communication;
+using DevQuestions.Application.DataBase;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+
 
 namespace DevQuestions.Application;
 
@@ -10,7 +13,13 @@ public static class DependencyInjection
     {
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
-        services.AddScoped<IQuestionsService, QuestionsService>();
+        var assembly = typeof(DependencyInjection).Assembly;
+
+        services.Scan(scan => scan.FromAssemblies(assembly)
+            .AddClasses(classes => classes
+                .AssignableToAny(typeof(IHandler<,>), typeof(IHandler<>)))
+            .AsSelfWithInterfaces()
+            .WithScopedLifetime());
 
         return services;
     }
