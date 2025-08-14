@@ -9,7 +9,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPostgresInfrastructure(this IServiceCollection services)
     {
-        services.AddDbContext<QuestionsDbContext>();
+        services.AddDbContext<QuestionsReadDbContext>();
         services.AddScoped<IQuestionsRepository, QuestionsEfCoreRepository>();
         services.AddScoped<ITransactionManager, TransactionManager>();
 

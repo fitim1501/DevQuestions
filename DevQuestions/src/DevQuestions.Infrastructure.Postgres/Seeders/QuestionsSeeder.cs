@@ -2,9 +2,9 @@
 
 public class QuestionsSeeder : ISeeder
 {
-    private readonly QuestionsDbContext _context;
+    private readonly QuestionsReadDbContext _context;
 
-    public QuestionsSeeder(QuestionsDbContext context)
+    public QuestionsSeeder(QuestionsReadDbContext context)
     {
         _context = context;
     }

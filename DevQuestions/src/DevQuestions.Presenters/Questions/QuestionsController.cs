@@ -2,8 +2,10 @@
 using DevQuestions.Application.Questions;
 using DevQuestions.Application.Questions.Features.AddAnswer;
 using DevQuestions.Application.Questions.Features.CreateQuestion;
+using DevQuestions.Application.Questions.Features.GetQuestionsWithFilters;
 using DevQuestions.Contracts.Questions;
 using DevQuestions.Contracts.Questions.Dtos;
+using DevQuestions.Contracts.Questions.Responses;
 using DevQuestions.Presenters.ResponseExtenstions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,9 +28,16 @@ namespace DevQuestions.Presenters.Questions
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] GetQuestionDto request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Get(
+            [FromServices] IHandler<QuestionResponse, GetQuestionsWithFiltersCommand> handler,
+            [FromQuery] GetQuestionDto request,
+            CancellationToken cancellationToken)
         {
-            return Ok("Questions get");
+            var command = new GetQuestionsWithFiltersCommand(request);
+
+            var result = await handler.Handle(command, cancellationToken);
+
+            return result.IsFailure ? result.Error.ToResponse() : Ok(result.Value);
         }
 
         [HttpGet("{questionId:guid}")]

@@ -2,6 +2,7 @@
 using Dapper;
 using DevQuestions.Application.DataBase;
 using DevQuestions.Application.Questions;
+using DevQuestions.Application.Questions.Features.GetQuestionsWithFilters;
 using DevQuestions.Domain.Questions;
 using Shared;
 
@@ -43,6 +44,7 @@ public class QuestionsSqlRepository : IQuestionsRepository
     public Task<Guid> DeleteAsync(Guid questionId, CancellationToken cancellationToken) => throw new NotImplementedException();
 
     public Task<Result<Question, Failure>> GetByIdAsync(Guid questionId, CancellationToken cancellationToken) => throw new NotImplementedException();
+    public Task<(IReadOnlyList<Question> Questions, long count)> GetQuestionsWithFiltersAsync(GetQuestionsWithFiltersCommand command, CancellationToken cancellationToken) => throw new NotImplementedException();
 
     public Task<int> GetOpenUserQuestionsAsync(Guid userId, CancellationToken cancellationToken) => throw new NotImplementedException();
     public Task<Guid> AddAnswerAsync(Answer answer, CancellationToken cancellationToken) => throw new NotImplementedException();

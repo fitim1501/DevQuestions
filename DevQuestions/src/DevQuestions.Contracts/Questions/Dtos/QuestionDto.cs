@@ -6,6 +6,6 @@ public record QuestionDto(
     string Text,
     Guid UserId,
     string? ScreenshotUrl,
-    Guid SolutionId,
+    Guid? SolutionId,
     IEnumerable<string> Tags,
     string Status);
