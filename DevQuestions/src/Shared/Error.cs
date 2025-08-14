@@ -40,7 +40,7 @@ public enum ErrorType
     /// Неизвестная ошибка
     /// </summary>
     None = 0,
-    
+
     /// <summary>
     /// Ошибка с валидацией.
     /// </summary>

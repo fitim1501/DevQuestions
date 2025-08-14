@@ -49,7 +49,7 @@ public class QuestionsEfCoreRepository : IQuestionsRepository
         {
             return Errors.General.NotFound(questionId).ToFailure();
         }
-        
+
         return question;
     }
 
