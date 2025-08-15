@@ -1,4 +1,4 @@
-﻿using DevQuestion.Infrastructure.Postgres.Repositories;
+﻿using DevQuestion.Infrastructure.Postgres.Questions;
 using DevQuestions.Application.DataBase;
 using DevQuestions.Application.Questions;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,4 @@
 ﻿using DevQuestions.Application.Abstractions;
-using DevQuestions.Application.Communication;
-using DevQuestions.Application.DataBase;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +7,7 @@ namespace DevQuestions.Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddSharedDependencies(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 

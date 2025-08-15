@@ -2,6 +2,7 @@
 using DevQuestions.Application.DataBase;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using Shared.DataBase;
 
 namespace DevQuestion.Infrastructure.Postgres;
 

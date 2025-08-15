@@ -1,5 +1,4 @@
 ﻿using DevQuestions.Application.Abstractions;
-using DevQuestions.Application.Communication;
 using DevQuestions.Application.DataBase;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
